@@ -1,7 +1,9 @@
 Matching-Theory
 ======
-Learning Matching-Theory with coding in Python
+Learning Matching-Theory with coding in Python.  
+I create a code, [matching.py](https://github.com/yoshimasaogawa/Matching-Theory/blob/master/matching.py),  
+and use this in ipython notebooks below.
 
-受入保留方式アルゴリズム
+Deferred Acceptance Algorithm
 ------
-・[安定結婚問題](https://github.com/yoshimasaogawa/Report/blob/master/Deferred%20Acceptance/TheStabilityOfMarriage.py)  
+・[Stable Marriage Problem](http://nbviewer.ipython.org/github/yoshimasaogawa/Matching-Theory/blob/master/marriage.ipynb)  
