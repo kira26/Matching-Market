@@ -1,11 +1,25 @@
-# coding: UTF-8
+"""
+Filename: matching.py
+Authors: Yoshimasa Ogawa
+LastModified: 14/06/2015
+
+A collection of functions to solve the matching problems.
+"""
+
 import networkx
 import matplotlib.pyplot as plt
 import numpy as np
 
 
 class Marriage:
-    def __init__(self, malenum = 0, femalenum = 0):
+    """
+    Solve one-to-one matching problems by Deferred Acceptance Algorithm.
+    You can use these set_ functions to set the initial variables.
+    match() returns a stable matching pair.
+    graph() print a graph about the matching pair made by match().
+    """
+
+    def __init__(self, malenum=0, femalenum=0):
         self.malenum = malenum
         self.femalenum = femalenum
         self.mprefer = [[None for col in range(femalenum)] for row in range(malenum)]
@@ -26,6 +40,11 @@ class Marriage:
         self.fname = fname
 
     def match(self):
+        """
+        Returns a dictionary "married", a stable matching showed by
+        Deferred Acceptance Algorithm. Before using this function,
+        you should set some variables by using above functions.
+        """
         m_single = range(self.malenum)
         f_single = range(self.femalenum)
         self.married = {}
@@ -61,9 +80,13 @@ class Marriage:
             if k in f_single:
                 f_single.remove(k)
                 self.married.update({self.fname[k]: 0})
-        return  self.married
+        return self.married
 
     def graph(self):
+        """
+        Print a graph about the matching pair made by match().
+        Lables of male are blue and that of female are red.
+        """
         vector = {}
         m_vector = {}
         f_vector = {}
