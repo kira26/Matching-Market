@@ -1,7 +1,7 @@
 """
 Filename: matching.py
 Authors: Yoshimasa Ogawa
-LastModified: 14/06/2015
+LastModified: 16/06/2015
 
 A collection of functions to solve the matching problems.
 """
