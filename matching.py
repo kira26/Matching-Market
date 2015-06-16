@@ -11,76 +11,92 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
+def acceptable(m_id, f_id, f_prefs):
+    """
+    Check the partner is acceptable.
+    Returns True or False.
+    """
+    if (-1 in f_prefs[f_id]):
+        if f_prefs[f_id].index(m_id) < f_prefs[f_id].index(-1):
+            return True
+        else:
+            return False
+    else:
+        return True
+
+def compare(m_id, f_id, f_prefs, f_matched):
+    """
+    Check the partner is better than ever.
+    Returns True or False.
+    """
+    if f_prefs[f_id].index(m_id) < f_prefs[f_id].index(f_matched[f_id]):
+        return True
+    else:
+        return False
+
+def deferred_acceptance(m_prefs, f_prefs):
+    """
+    For test_matching.py.
+    Return 2 lists that include male, female pair information.
+    """
+    test = Marriage()
+    m_matched, f_matched = test.match(m_prefs, f_prefs)
+    return m_matched, f_matched
+
 class Marriage:
     """
     Solve one-to-one matching problems by Deferred Acceptance Algorithm.
-    You can use these set_ functions to set the initial variables.
-    match() returns a stable matching pair.
+    match() returns 2 lists, m_matched and f_matched.
     graph() print a graph about the matching pair made by match().
     """
-
-    def __init__(self, malenum=0, femalenum=0):
-        self.malenum = malenum
-        self.femalenum = femalenum
-        self.mprefer = [[None for col in range(femalenum)] for row in range(malenum)]
-        self.fprefer = [[None for col in range(malenum)] for row in range(femalenum)]
-        self.mname = range(malenum)
-        self.fname = range(femalenum)
-
-    def set_num(malenum, femalenum):
-        self.malenum = malenum
-        self.femalenum = femalenum
-
-    def set_prefer(self, mprefer, fprefer):
-        self.mprefer = mprefer
-        self.fprefer = fprefer
-
-    def set_name(self, mname, fname):
-        self.mname = mname
-        self.fname = fname
-
-    def match(self):
-        """
-        Returns a dictionary "married", a stable matching showed by
-        Deferred Acceptance Algorithm. Before using this function,
-        you should set some variables by using above functions.
-        """
-        m_single = range(self.malenum)
-        f_single = range(self.femalenum)
-        self.married = {}
+    def match(self, m_prefs, f_prefs):
+        self.m_prefs = m_prefs
+        self.f_prefs = f_prefs
+        self.m_num = len(m_prefs)
+        self.f_num = len(f_prefs)
+        self.m_matched = [None for col in range(self.m_num)]
+        self.f_matched = [None for col in range(self.f_num)]
+        self.m_name = range(self.m_num)
+        self.f_name = range(self.f_num)
+        m_single = range(self.m_num)
+        f_single = range(self.f_num)
         while len(m_single) >= 1:
-            for i in range(self.malenum):
+            for i in range(self.m_num):
                 if i in m_single:
-                    for j in range(len(self.mprefer[i])):
-                        femaleid = self.mprefer[i][j]
-                        femaleallid = self.mprefer[i][j] + self.malenum
-                        if femaleid < 0:
+                    m_id = i
+                    for j in range(len(self.m_prefs[i])):
+                        f_id = self.m_prefs[m_id][j]
+                        if f_id < 0:
                             m_single.remove(i)
-                            self.married.update({self.mname[i]: 0})
+                            self.m_matched[m_id] = -1
                             break
-                        if femaleid in f_single:
-                            if i in self.fprefer[femaleid]:
-                                m_single.remove(i)
-                                f_single.remove(femaleid)
-                                self.married.update({self.fname[femaleid]: self.mname[i]})
-                                self.married.update({self.mname[i]: self.fname[femaleid]})
+                        elif f_id in f_single:
+                            if acceptable(m_id, f_id, f_prefs):
+                                m_single.remove(m_id)
+                                f_single.remove(f_id)
+                                self.m_matched[m_id] = f_id
+                                self.f_matched[f_id] = m_id
                                 break
-                        elif i in self.fprefer[femaleid]:
-                            if self.fprefer[femaleid].index(self.mname.index(self.married[self.fname[femaleid]])) > self.fprefer[femaleid].index(i):
-                                m_single.append(self.mname.index(self.married[self.fname[femaleid]]))
+                        else:
+                            if compare(m_id, f_id, f_prefs, self.f_matched):
+                                m_single.append(self.f_matched[f_id])
+                                self.m_matched[self.f_matched[f_id]] = -1
                                 m_single.remove(i)
-                                self.married.update({self.married[self.fname[femaleid]]: 0})
-                                self.married.update({self.fname[femaleid]: self.mname[i]})
-                                self.married.update({self.mname[i]: self.fname[femaleid]})
+                                self.m_matched[m_id] = f_id
+                                self.f_matched[f_id] = m_id
                                 break
-                    if i in m_single:
+                    if m_id in m_single:
                         m_single.remove(i)
-                        self.married.update({self.mname[i]: 0})
-        for k in range(self.femalenum):
+                        self.m_matched[m_id] = -1
+        for k in range(self.f_num):
             if k in f_single:
                 f_single.remove(k)
-                self.married.update({self.fname[k]: 0})
-        return self.married
+                self.f_matched[k] = -1
+        return self.m_matched, self.f_matched
+
+    def set_name(self, m_name, f_name):
+        self.m_name = m_name
+        self.f_name = f_name
 
     def graph(self):
         """
@@ -93,28 +109,20 @@ class Marriage:
         pos = {}
         m_pos = {}
         f_pos = {}
-        for i in self.mname:
-            vector[i] = []
-            m_vector[i] = []
-            if self.married[i] != 0:
-                vector[i].append(self.married[i])
-        for i in self.fname:
-            vector[i] = []
-            f_vector[i] = []
-            if self.married[i] != 0:
-                vector[i].append(self.married[i])
-        counter = 0
-        for i in self.mname:
-            j = len(self.mname)
-            pos[i] = np.array([1, j-counter])
-            m_pos[i] = np.array([1, j-counter])
-            counter += 1
-        counter = 0
-        for i in self.fname:
-            j = len(self.fname)
-            pos[i] = np.array([2, j-counter])
-            f_pos[i] = np.array([2, j-counter])
-            counter += 1
+        for i in range(self.m_num):
+            vector["m%s" % i] = []
+            m_vector[self.m_name[i]] = []
+            pos["m%s" % i] = np.array([1, self.m_num-i])
+            m_pos[self.m_name[i]] = np.array([1, self.m_num-i])
+            if self.m_matched[i] != -1:
+                vector["m%s" % i].append("f%s" % self.m_matched[i])
+        for i in range(self.f_num):
+            vector["f%s" % i] = []
+            f_vector[self.f_name[i]] = []
+            pos["f%s" % i] = np.array([2, self.f_num-i])
+            f_pos[self.f_name[i]] = np.array([2, self.f_num-i])
+            if self.f_name[i] != -1:
+                vector["f%s" % i].append("m%s" % self.f_matched[i])
         graph = networkx.Graph(vector)
         m_graph = networkx.Graph(m_vector)
         f_graph = networkx.Graph(f_vector)
