@@ -9,6 +9,7 @@ A collection of functions to solve the matching problems.
 import networkx
 import matplotlib.pyplot as plt
 import numpy as np
+import random
 
 
 def acceptable(m_id, f_id, f_prefs):
@@ -33,6 +34,15 @@ def compare(m_id, f_id, f_prefs, f_matched):
         return True
     else:
         return False
+
+def make_prefs(m_num, f_num):
+    m_prefs = [range(-1, f_num) for col in range(m_num)]
+    f_prefs = [range(-1, m_num) for col in range(f_num)]
+    for i in range(m_num):
+        random.shuffle(m_prefs[i])
+    for i in range(f_num):
+        random.shuffle(f_prefs[i])
+    return m_prefs, f_prefs
 
 def deferred_acceptance(m_prefs, f_prefs):
     """
@@ -121,7 +131,7 @@ class Marriage:
             f_vector[self.f_name[i]] = []
             pos["f%s" % i] = np.array([2, self.f_num-i])
             f_pos[self.f_name[i]] = np.array([2, self.f_num-i])
-            if self.f_name[i] != -1:
+            if self.f_matched[i] != -1:
                 vector["f%s" % i].append("m%s" % self.f_matched[i])
         graph = networkx.Graph(vector)
         m_graph = networkx.Graph(m_vector)
