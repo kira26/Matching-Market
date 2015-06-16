@@ -119,18 +119,19 @@ class Marriage:
         pos = {}
         m_pos = {}
         f_pos = {}
+        height = max(self.m_num, self.f_num)
         for i in range(self.m_num):
             vector["m%s" % i] = []
             m_vector[self.m_name[i]] = []
-            pos["m%s" % i] = np.array([1, self.m_num-i])
-            m_pos[self.m_name[i]] = np.array([1, self.m_num-i])
+            pos["m%s" % i] = np.array([1, height-i])
+            m_pos[self.m_name[i]] = np.array([1, height-i])
             if self.m_matched[i] != -1:
                 vector["m%s" % i].append("f%s" % self.m_matched[i])
         for i in range(self.f_num):
             vector["f%s" % i] = []
             f_vector[self.f_name[i]] = []
-            pos["f%s" % i] = np.array([2, self.f_num-i])
-            f_pos[self.f_name[i]] = np.array([2, self.f_num-i])
+            pos["f%s" % i] = np.array([2, height-i])
+            f_pos[self.f_name[i]] = np.array([2, height-i])
             if self.f_matched[i] != -1:
                 vector["f%s" % i].append("m%s" % self.f_matched[i])
         graph = networkx.Graph(vector)
