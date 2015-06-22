@@ -1,7 +1,7 @@
 """
 Filename: matching.py
 Authors: Yoshimasa Ogawa
-LastModified: 16/06/2015
+LastModified: 22/06/2015
 
 A collection of functions to solve the matching problems.
 """
@@ -12,13 +12,13 @@ import numpy as np
 import random
 
 
-def acceptable(m_id, f_id, f_prefs):
+def acceptable(m_id, f_id, m_num, f_prefs):
     """
     Check the partner is acceptable.
     Returns True or False.
     """
-    if (-1 in f_prefs[f_id]):
-        if f_prefs[f_id].index(m_id) < f_prefs[f_id].index(-1):
+    if (m_num in f_prefs[f_id]):
+        if f_prefs[f_id].index(m_id) < f_prefs[f_id].index(m_num):
             return True
         else:
             return False
@@ -36,8 +36,8 @@ def compare(m_id, f_id, f_prefs, f_matched):
         return False
 
 def make_prefs(m_num, f_num):
-    m_prefs = [range(-1, f_num) for col in range(m_num)]
-    f_prefs = [range(-1, m_num) for col in range(f_num)]
+    m_prefs = [range(0, f_num+1) for col in range(m_num)]
+    f_prefs = [range(0, m_num+1) for col in range(f_num)]
     for i in range(m_num):
         random.shuffle(m_prefs[i])
     for i in range(f_num):
@@ -71,37 +71,36 @@ class Marriage:
         m_single = range(self.m_num)
         f_single = range(self.f_num)
         while len(m_single) >= 1:
-            for i in range(self.m_num):
-                if i in m_single:
-                    m_id = i
-                    for j in range(len(self.m_prefs[i])):
-                        f_id = self.m_prefs[m_id][j]
-                        if f_id < 0:
-                            m_single.remove(i)
-                            self.m_matched[m_id] = -1
-                            break
-                        elif f_id in f_single:
-                            if acceptable(m_id, f_id, f_prefs):
-                                m_single.remove(m_id)
-                                f_single.remove(f_id)
-                                self.m_matched[m_id] = f_id
-                                self.f_matched[f_id] = m_id
-                                break
-                        else:
-                            if compare(m_id, f_id, f_prefs, self.f_matched):
-                                m_single.append(self.f_matched[f_id])
-                                self.m_matched[self.f_matched[f_id]] = -1
-                                m_single.remove(i)
-                                self.m_matched[m_id] = f_id
-                                self.f_matched[f_id] = m_id
-                                break
-                    if m_id in m_single:
+            for i in m_single:
+                m_id = i
+                for j in self.m_prefs[i]:
+                    f_id = j
+                    if f_id == self.f_num:
                         m_single.remove(i)
-                        self.m_matched[m_id] = -1
+                        self.m_matched[m_id] = self.f_num
+                        break
+                    if f_id in f_single:
+                        if acceptable(m_id, f_id, self.m_num, self.f_prefs):
+                            m_single.remove(m_id)
+                            f_single.remove(f_id)
+                            self.m_matched[m_id] = f_id
+                            self.f_matched[f_id] = m_id
+                            break
+                    else:
+                        if compare(m_id, f_id, self.f_prefs, self.f_matched):
+                            m_single.append(self.f_matched[f_id])
+                            self.m_matched[self.f_matched[f_id]] = -1
+                            m_single.remove(i)
+                            self.m_matched[m_id] = f_id
+                            self.f_matched[f_id] = m_id
+                            break
+                if m_id in m_single:
+                    m_single.remove(i)
+                    self.m_matched[m_id] = self.f_num
         for k in range(self.f_num):
             if k in f_single:
                 f_single.remove(k)
-                self.f_matched[k] = -1
+                self.f_matched[k] = self.m_num
         return self.m_matched, self.f_matched
 
     def set_name(self, m_name, f_name):
