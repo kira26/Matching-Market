@@ -25,6 +25,7 @@ def acceptable(m_id, f_id, m_num, f_prefs):
     else:
         return True
 
+
 def compare(m_id, f_id, f_prefs, f_matched):
     """
     Check the partner is better than ever.
@@ -35,14 +36,20 @@ def compare(m_id, f_id, f_prefs, f_matched):
     else:
         return False
 
-def make_prefs(m_num, f_num):
-    m_prefs = [range(0, f_num+1) for col in range(m_num)]
-    f_prefs = [range(0, m_num+1) for col in range(f_num)]
+
+def make_prefs(m_num, f_num, allow_unmatched=True):
+    if allow_unmatched == True:
+        m_prefs = [range(0, f_num+1) for col in range(m_num)]
+        f_prefs = [range(0, m_num+1) for col in range(f_num)]
+    else:
+        m_prefs = [range(0, f_num) for col in range(m_num)]
+        f_prefs = [range(0, m_num) for col in range(f_num)]
     for i in range(m_num):
         random.shuffle(m_prefs[i])
     for i in range(f_num):
         random.shuffle(f_prefs[i])
     return m_prefs, f_prefs
+
 
 def deferred_acceptance(m_prefs, f_prefs):
     """
@@ -52,6 +59,7 @@ def deferred_acceptance(m_prefs, f_prefs):
     test = Marriage()
     m_matched, f_matched = test.match(m_prefs, f_prefs)
     return m_matched, f_matched
+
 
 class Marriage:
     """
@@ -124,14 +132,14 @@ class Marriage:
             m_vector[self.m_name[i]] = []
             pos["m%s" % i] = np.array([1, height-i])
             m_pos[self.m_name[i]] = np.array([1, height-i])
-            if self.m_matched[i] != -1:
+            if self.m_matched[i] != self.f_num:
                 vector["m%s" % i].append("f%s" % self.m_matched[i])
         for i in range(self.f_num):
             vector["f%s" % i] = []
             f_vector[self.f_name[i]] = []
             pos["f%s" % i] = np.array([2, height-i])
             f_pos[self.f_name[i]] = np.array([2, height-i])
-            if self.f_matched[i] != -1:
+            if self.f_matched[i] != self.m_num:
                 vector["f%s" % i].append("m%s" % self.f_matched[i])
         graph = networkx.Graph(vector)
         m_graph = networkx.Graph(m_vector)
