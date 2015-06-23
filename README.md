@@ -11,7 +11,7 @@ Compute the Stable Matching
 ・[NetworkX](https://networkx.github.io/)  
 Draw matching-graphs with NetworkX.   
 ・[Brython](http://www.brython.info/)  
-Brython enable you to use Python for Browser.  
+Brython enable you to use Python for web programming.  
   
 ##References
 ・D. Gale and L.S. Shapley, "[College Admissions and the Stability of Marriage](http://www.jstor.org/stable/2312726?seq=1#page_scan_tab_contents)," American Mathematical Monthly 69 (1962), 9-15  
