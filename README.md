@@ -9,7 +9,7 @@ Compute the Stable Matching
   
 ##About Packages Used
 ・[NetworkX](https://networkx.github.io/)  
-Draw matching-graphs with this package.   
+Draw matching-graphs with NetworkX.   
 ・[Brython](http://www.brython.info/)  
 Brython enable you to use Python for Browser.  
   
