@@ -24,6 +24,9 @@ def deferred_acceptance(prop_prefs, resp_prefs, caps=None):
     resp_prefs : ndarray(int, ndim=2)
         Preference of respondants
 
+    caps : list
+        Capacity of respondants
+
 
     Return
     ------
