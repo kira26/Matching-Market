@@ -13,11 +13,47 @@ import random
 
 def deferred_acceptance(prop_prefs, resp_prefs, caps=None):
     """
-    For test_matching.py.
-    Return 2 lists that include male, female pair information.
+    Compute matching problems by Deferred Acceptance Algorithm.
+
+
+    Parameters
+    ----------
+    prop_prefs : ndarray(int, ndim=2)
+        Preference of proposers
+
+    resp_prefs : ndarray(int, ndim=2)
+        Preference of respondants
+
+
+    Return
+    ------
+    One-to-One Matching ( caps is None ):
+
+        prop_matches : ndarray(int, ndim=1)
+            Stable Matching Pairs in which index is
+            the number of proposers
+
+        resp_matched : ndarray(int, ndim=1)
+            Stable Matching Pairs in which index is
+            the number of respondants
+
+
+    Many-to-One Matching ( caps is list ):
+
+        prop_matches : ndarray(int, ndim=1)
+            Stable Matching Pairs in which index is
+            the number of proposers
+
+        resp_matched : ndarray(int, ndim=1)
+            Stable Matching Pairs
+
+        indptr : ndarray(int, ndim=1)
+            Array that shows which respondants match
+            with proposers in resp_matched
+
     """
     test = Marriage()
-    if caps == 0:
+    if caps is None:
         prop_matched, resp_matched = test.match(prop_prefs, resp_prefs, caps)
         return prop_matched, resp_matched
     else:
@@ -27,45 +63,6 @@ def deferred_acceptance(prop_prefs, resp_prefs, caps=None):
 
 class Marriage:
     def match(self, prop_prefs, resp_prefs, caps=None):
-        """
-        Compute matching problems by Deferred Acceptance Algorithm.
-
-
-        Parameters
-        ----------
-        prop_prefs : ndarray(int, ndim=2)
-            Preference of proposers
-
-        resp_prefs : ndarray(int, ndim=2)
-            Preference of respondants
-
-        Return
-        ------
-        if switch is 0 that means many-to-one matching,
-
-            prop_matches : ndarray(int, ndim=1)
-                Stable Matching Pairs in which index is
-                the number of proposers
-
-            resp_matched : ndarray(int, ndim=1)
-                Stable Matching Pairs
-
-            indptr : ndarray(int, ndim=1)
-                Array that shows which respondants match
-                with proposers in resp_matched
-
-
-        if switch is 1 that means one-to-one matching,
-
-            prop_matches : ndarray(int, ndim=1)
-                Stable Matching Pairs in which index is
-                the number of proposers
-
-            resp_matched : ndarray(int, ndim=1)
-                Stable Matching Pairs in which index is
-                the number of respondants
-
-        """
         # Set the variables
         self.prop_prefs = np.asarray(prop_prefs)
         self.resp_prefs = np.asarray(resp_prefs)
