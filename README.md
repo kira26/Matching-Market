@@ -3,9 +3,9 @@ Learning Matching-Market with coding in Python.
 
 ##Deferred Acceptance Algorithm
 Compute the Stable Matching  
-・[matching.py](https://github.com/yoshimasaogawa/Matching-Theory/blob/master/matching.py)  
-・[Ipython Notebook](http://nbviewer.ipython.org/github/yoshimasaogawa/Matching-Market/blob/master/matching.ipynb)  
-・[Web Page](https://yoshimasaogawa.github.io/marriage/index.html)  
+・[matching.py](https://github.com/ogaway/Matching-Market/blob/master/matching.py)  
+・[Ipython Notebook](http://nbviewer.ipython.org/github/ogaway/Matching-Market/blob/master/matching.ipynb)  
+・[Web Page](https://ogaway.github.io/marriage/index.html)  
   
 ##Packages
 ・[NetworkX](https://networkx.github.io/)  
