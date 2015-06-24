@@ -13,10 +13,9 @@ import random
 
 class Matching:
 
-    def match(self, prop_prefs, resp_prefs, caps=None):
+    def __init__(self, prop_prefs, resp_prefs, caps=None):
         """
         Compute matching problems by Deferred Acceptance Algorithm.
-
 
         Parameters
         ----------
@@ -29,35 +28,7 @@ class Matching:
         caps : list
             Capacity of respondants
 
-
-        Return
-        ------
-        One-to-One Matching ( caps is None ):
-
-            prop_matches : ndarray(int, ndim=1)
-                Stable Matching Pairs in which index is
-                the number of proposers
-
-            resp_matched : ndarray(int, ndim=1)
-                Stable Matching Pairs in which index is
-                the number of respondants
-
-
-        Many-to-One Matching ( caps is list ):
-
-            prop_matches : ndarray(int, ndim=1)
-                Stable Matching Pairs in which index is
-                the number of proposers
-
-            resp_matched : ndarray(int, ndim=1)
-                Stable Matching Pairs
-
-            indptr : ndarray(int, ndim=1)
-                Array that shows which respondants match
-                with proposers in resp_matched
-
         """
-        # Set the variables
         self.prop_prefs = np.asarray(prop_prefs)
         self.resp_prefs = np.asarray(resp_prefs)
         self.prop_num = self.prop_prefs.shape[0]
@@ -65,22 +36,20 @@ class Matching:
         self.prop_unmatched = self.resp_num
         self.resp_unmatched = self.prop_num
         self.resp_ranks = np.argsort(resp_prefs)
-        self.switch = 0
         if caps is None:
-            self.switch = 1
             caps = [1 for col in range(self.resp_num)]
+        self.caps = caps
         self.prop_matched = np.zeros(self.prop_num, dtype=int) + self.prop_unmatched
-        self.resp_matched = np.zeros([self.resp_num, max(caps)], dtype=int) + self.resp_unmatched
+        self.resp_matched_matrix = np.zeros([self.resp_num, max(caps)], dtype=int) + self.resp_unmatched
+        self.resp_matched = np.zeros(sum(self.caps), dtype=int)
         self.prop_name = range(self.prop_num)
         self.resp_name = range(self.resp_num)
-        self.caps = caps
         self.indptr = np.zeros(self.resp_num+1, dtype=int)
         np.cumsum(caps, out=self.indptr[1:])
 
         prop_single = range(self.prop_num)
         caps_rest = [i for i in caps]
 
-        # Start matching
         while len(prop_single) >= 1:
             for i in prop_single:
                 prop_id = i
@@ -96,16 +65,16 @@ class Matching:
                                 prop_single.remove(prop_id)
                                 self.prop_matched[prop_id] = resp_id
                                 caps_rest[resp_id] -= 1
-                                self.resp_matched[resp_id][caps_rest[resp_id]] = prop_id
+                                self.resp_matched_matrix[resp_id][caps_rest[resp_id]] = prop_id
                                 break
                         else:
                             prop_single.remove(prop_id)
                             self.prop_matched[prop_id] = resp_id
                             caps_rest[resp_id] -= 1
-                            self.resp_matched[resp_id][caps_rest[resp_id]] = prop_id
+                            self.resp_matched_matrix[resp_id][caps_rest[resp_id]] = prop_id
                             break
                     else:
-                        deffered = self.resp_matched[resp_id][:self.caps[resp_id]]
+                        deffered = self.resp_matched_matrix[resp_id][:self.caps[resp_id]]
                         max_rank = max([self.resp_ranks[resp_id][i] for i in deffered])
                         max_id = self.resp_prefs[resp_id][max_rank]
                         if self.resp_ranks[resp_id][prop_id] < max_rank:
@@ -114,24 +83,97 @@ class Matching:
                             self.prop_matched[max_id] = self.prop_unmatched
                             self.prop_matched[prop_id] = resp_id
                             deffered = np.hstack((np.delete(deffered, np.where(deffered == max_id)[0]), prop_id))
-                            self.resp_matched[resp_id] = deffered
+                            self.resp_matched_matrix[resp_id][:self.caps[resp_id]] = deffered
                             break
                 if prop_id in prop_single:
                     prop_single.remove(prop_id)
                     self.prop_matched[prop_id] = self.prop_unmatched
-        resp_matched_comp0 = self.resp_matched
-        resp_matched_comp = np.zeros(sum(self.caps), dtype=int)
         for i in range(self.resp_num):
-            resp_matched_comp[self.indptr[i]:self.indptr[i]+self.caps[i]] = self.resp_matched[i][:self.caps[i]]
-        self.resp_matched = resp_matched_comp
+            self.resp_matched[self.indptr[i]:self.indptr[i]+self.caps[i]] = self.resp_matched_matrix[i][:self.caps[i]]
 
-        # Return the answer
-        if self.switch == 0:
-            return self.prop_matched, self.resp_matched, self.indptr
-        elif self.switch == 1:
-            return self.prop_matched, self.resp_matched
+
+    def get_pairs(self, switch=None):
+        """
+        Get the stable matching pairs.
+
+        Parameters
+        ----------
+
+        switch : scalar(int)
+            if switch = None (default)
+                return prop_matched, resp_matched (, indptr)
+            else:
+                return prop_matched, resp_matched_matrix
+
+        Return
+        ------
+        One-to-One Matching :
+
+            prop_matched : ndarray(int, ndim=1)
+                Stable Matching Pairs in which index is
+                the number of proposers
+
+            resp_matched : ndarray(int, ndim=1)
+                Stable Matching Pairs in which index is
+                the number of respondants
+
+
+        Many-to-One Matching :
+
+            prop_matched : ndarray(int, ndim=1)
+                Stable Matching Pairs in which index is
+                the number of proposers
+
+            resp_matched : ndarray(int, ndim=1)
+                Stable Matching Pairs
+
+            indptr : ndarray(int, ndim=1)
+                Array that shows which respondants match
+                with proposers in resp_matched
+
+            resp_matched_matrix : ndarray(int, ndim=2)
+                Stable Matching Pairs in which index is
+                the number of respondants
+
+        """
+        if switch is None:
+            if self.caps == [1 for col in range(self.resp_num)]:
+                return self.prop_matched, self.resp_matched
+            else:
+                return self.prop_matched, self.resp_matched, self.indptr
         else:
-            return self.prop_matched, resp_matched_comp0
+            return self.prop_matched, self.resp_matched_matrix
+
+
+
+    def summary(self, switch=None):
+        print "-----Initial Setting-----"
+        print "The number of proposers : %s" % self.prop_num
+        print "The number of respondants : %s" % self.resp_num
+        print "Preference of proposers : (unmatched = %s)" % self.prop_unmatched
+        print self.prop_prefs
+        print "Preference of respondants : (unmatched = %s)" % self.resp_unmatched
+        print self.resp_prefs
+        if self.caps != [1 for col in range(self.resp_num)]:
+            print "Capacity of respondants : "
+            print self.caps
+        print "-----Matching Type-----"
+        if self.caps == [1 for col in range(self.resp_num)]:
+            print "One-to-One Matching"
+        else:
+            print "Many-to-One Matching"
+        print "-----Result-----"
+        print "Stable matching pairs"
+        print "Proposers side : "
+        print self.prop_matched
+        print "Respondants side : "
+        if switch is None:
+            print self.resp_matched
+            if self.caps != [1 for col in range(self.resp_num)]:
+                print "indptr : "
+                print self.indptr
+        else:
+            print self.resp_matched_matrix
 
 
     def set_name(self, prop_name, resp_name):
@@ -177,10 +219,10 @@ class Matching:
 
 
 def deferred_acceptance(prop_prefs, resp_prefs, caps=None):
-    test = Marriage()
+    test = Marriage(prop_prefs, resp_prefs, caps)
     if caps is None:
-        prop_matched, resp_matched = test.match(prop_prefs, resp_prefs, caps)
+        prop_matched, resp_matched = get_pairs()
         return prop_matched, resp_matched
     else:
-        prop_matched, resp_matched, indptr = test.match(prop_prefs, resp_prefs, caps)
+        prop_matched, resp_matched, indptr = get_pairs(1)
         return prop_matched, resp_matched, indptr
