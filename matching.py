@@ -36,7 +36,9 @@ class Matching:
         self.prop_unmatched = self.resp_num
         self.resp_unmatched = self.prop_num
         self.resp_ranks = np.argsort(resp_prefs)
+        self.switch = 1
         if caps is None:
+            self.switch = 0
             caps = [1 for col in range(self.resp_num)]
         self.caps = caps
         self.prop_matched = np.zeros(self.prop_num, dtype=int) + self.prop_unmatched
@@ -92,22 +94,13 @@ class Matching:
             self.resp_matched[self.indptr[i]:self.indptr[i]+self.caps[i]] = self.resp_matched_matrix[i][:self.caps[i]]
 
 
-    def get_pairs(self, switch=None):
+    def get_pairs(self):
         """
         Get the stable matching pairs.
 
-        Parameters
-        ----------
-
-        switch : scalar(int)
-            if switch = None (default)
-                return prop_matched, resp_matched (, indptr)
-            else:
-                return prop_matched, resp_matched_matrix
-
         Return
         ------
-        One-to-One Matching :
+        One-to-One Matching ( switch is 0 ):
 
             prop_matched : ndarray(int, ndim=1)
                 Stable Matching Pairs in which index is
@@ -118,7 +111,7 @@ class Matching:
                 the number of respondants
 
 
-        Many-to-One Matching :
+        Many-to-One Matching ( switch is 1 ):
 
             prop_matched : ndarray(int, ndim=1)
                 Stable Matching Pairs in which index is
@@ -131,19 +124,11 @@ class Matching:
                 Array that shows which respondants match
                 with proposers in resp_matched
 
-            resp_matched_matrix : ndarray(int, ndim=2)
-                Stable Matching Pairs in which index is
-                the number of respondants
-
         """
-        if switch is None:
-            if self.caps == [1 for col in range(self.resp_num)]:
+        if self.switch == 0:
                 return self.prop_matched, self.resp_matched
-            else:
-                return self.prop_matched, self.resp_matched, self.indptr
         else:
-            return self.prop_matched, self.resp_matched_matrix
-
+            return self.prop_matched, self.resp_matched, self.indptr
 
 
     def summary(self, switch=None):
@@ -154,11 +139,11 @@ class Matching:
         print self.prop_prefs
         print "Preference of respondants : (unmatched = %s)" % self.resp_unmatched
         print self.resp_prefs
-        if self.caps != [1 for col in range(self.resp_num)]:
+        if self.switch == 1:
             print "Capacity of respondants : "
             print self.caps
         print "-----Matching Type-----"
-        if self.caps == [1 for col in range(self.resp_num)]:
+        if self.switch == 0:
             print "One-to-One Matching"
         else:
             print "Many-to-One Matching"
@@ -167,13 +152,10 @@ class Matching:
         print "Proposers side : "
         print self.prop_matched
         print "Respondants side : "
-        if switch is None:
-            print self.resp_matched
-            if self.caps != [1 for col in range(self.resp_num)]:
-                print "indptr : "
-                print self.indptr
-        else:
-            print self.resp_matched_matrix
+        print self.resp_matched
+        if self.switch == 1:
+            print "indptr : "
+            print self.indptr
 
 
     def set_name(self, prop_name, resp_name):
@@ -219,10 +201,10 @@ class Matching:
 
 
 def deferred_acceptance(prop_prefs, resp_prefs, caps=None):
-    test = Marriage(prop_prefs, resp_prefs, caps)
+    test = Matching(prop_prefs, resp_prefs, caps)
     if caps is None:
-        prop_matched, resp_matched = get_pairs()
+        prop_matched, resp_matched = test.get_pairs()
         return prop_matched, resp_matched
     else:
-        prop_matched, resp_matched, indptr = get_pairs(1)
+        prop_matched, resp_matched, indptr = test.get_pairs()
         return prop_matched, resp_matched, indptr
