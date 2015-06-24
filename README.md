@@ -1,5 +1,5 @@
-#Matching-Theory
-Learning Matching-Theory with coding in Python.  
+#Matching-Market
+Learning Matching-Market with coding in Python.  
 
 ##Deferred Acceptance Algorithm
 Compute the Stable Matching  
@@ -7,11 +7,11 @@ Compute the Stable Matching
 ・[Ipython Notebook](http://nbviewer.ipython.org/github/yoshimasaogawa/Matching-Theory/blob/master/marriage.ipynb)  
 ・[Web Page](https://yoshimasaogawa.github.io/marriage/index.html)  
   
-##About Packages Used
+##Packages
 ・[NetworkX](https://networkx.github.io/)  
-Draw matching-graphs with NetworkX.   
+Draw matching-graphs.   
 ・[Brython](http://www.brython.info/)  
-Brython enable you to use Python for web programming.  
+Use Python for web programming.  
   
 ##References
 ・D. Gale and L.S. Shapley, "[College Admissions and the Stability of Marriage](http://www.jstor.org/stable/2312726?seq=1#page_scan_tab_contents)," American Mathematical Monthly 69 (1962), 9-15  
