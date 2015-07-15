@@ -42,61 +42,16 @@ class Matching:
             caps = [1 for col in range(self.resp_num)]
         self.caps = caps
         self.prop_matched = np.zeros(self.prop_num, dtype=int) + self.prop_unmatched
-        self.resp_matched_matrix = np.zeros([self.resp_num, max(caps)], dtype=int) + self.resp_unmatched
-        self.resp_matched = np.zeros(sum(self.caps), dtype=int)
+        self.resp_matched = np.zeros(sum(self.caps), dtype=int) + self.resp_unmatched
         self.prop_name = range(self.prop_num)
         self.resp_name = range(self.resp_num)
         self.indptr = np.zeros(self.resp_num+1, dtype=int)
+        self.algo = None
         np.cumsum(caps, out=self.indptr[1:])
 
-        prop_single = range(self.prop_num)
-        caps_rest = [i for i in caps]
-
-        while len(prop_single) >= 1:
-            for i in prop_single:
-                prop_id = i
-                for j in self.prop_prefs[prop_id]:
-                    resp_id = j
-                    if resp_id == self.prop_unmatched:
-                        prop_single.remove(prop_id)
-                        self.prop_matched[prop_id] = self.prop_unmatched
-                        break
-                    elif caps_rest[resp_id] >= 1:
-                        if self.resp_unmatched in self.resp_ranks[resp_id]:
-                            if self.resp_ranks[resp_id][prop_id] < self.resp_ranks[resp_id][self.resp_unmatched]:
-                                prop_single.remove(prop_id)
-                                self.prop_matched[prop_id] = resp_id
-                                caps_rest[resp_id] -= 1
-                                self.resp_matched_matrix[resp_id][caps_rest[resp_id]] = prop_id
-                                break
-                        else:
-                            prop_single.remove(prop_id)
-                            self.prop_matched[prop_id] = resp_id
-                            caps_rest[resp_id] -= 1
-                            self.resp_matched_matrix[resp_id][caps_rest[resp_id]] = prop_id
-                            break
-                    else:
-                        deffered = self.resp_matched_matrix[resp_id][:self.caps[resp_id]]
-                        max_rank = max([self.resp_ranks[resp_id][i] for i in deffered])
-                        max_id = self.resp_prefs[resp_id][max_rank]
-                        if self.resp_ranks[resp_id][prop_id] < max_rank:
-                            prop_single.append(max_id)
-                            prop_single.remove(prop_id)
-                            self.prop_matched[max_id] = self.prop_unmatched
-                            self.prop_matched[prop_id] = resp_id
-                            deffered = np.hstack((np.delete(deffered, np.where(deffered == max_id)[0]), prop_id))
-                            self.resp_matched_matrix[resp_id][:self.caps[resp_id]] = deffered
-                            break
-                if prop_id in prop_single:
-                    prop_single.remove(prop_id)
-                    self.prop_matched[prop_id] = self.prop_unmatched
-        for i in range(self.resp_num):
-            self.resp_matched[self.indptr[i]:self.indptr[i]+self.caps[i]] = self.resp_matched_matrix[i][:self.caps[i]]
-
-
-    def get_pairs(self):
+    def DA(self):
         """
-        Get the stable matching pairs.
+        Get the stable matching pairs by Deffered Acceptance Algorithm.
 
         Return
         ------
@@ -125,13 +80,122 @@ class Matching:
                 with proposers in resp_matched
 
         """
+        self.algo = "Deffered Acceptance"
+        self.prop_matched = np.zeros(self.prop_num, dtype=int) + self.prop_unmatched
+        self.resp_matched = np.zeros(sum(self.caps), dtype=int) + self.resp_unmatched
+        prop_single = range(self.prop_num)
+        caps_rest = [i for i in self.caps]
+
+        while len(prop_single) >= 1:
+            for i in prop_single:
+                prop_id = i
+                for j in self.prop_prefs[prop_id]:
+                    resp_id = j
+                    if resp_id == self.prop_unmatched:
+                        prop_single.remove(prop_id)
+                        self.prop_matched[prop_id] = self.prop_unmatched
+                        break
+                    elif caps_rest[resp_id] >= 1:
+                        if self.resp_unmatched in self.resp_ranks[resp_id]:
+                            if self.resp_ranks[resp_id][prop_id] < self.resp_ranks[resp_id][self.resp_unmatched]:
+                                prop_single.remove(prop_id)
+                                self.prop_matched[prop_id] = resp_id
+                                caps_rest[resp_id] -= 1
+                                self.resp_matched[self.indptr[resp_id]+caps_rest[resp_id]] = prop_id
+                                break
+                        else:
+                            prop_single.remove(prop_id)
+                            self.prop_matched[prop_id] = resp_id
+                            caps_rest[resp_id] -= 1
+                            self.resp_matched[self.indptr[resp_id]+caps_rest[resp_id]] = prop_id
+                            break
+                    else:
+                        deffered = self.resp_matched[self.indptr[resp_id]:self.indptr[resp_id+1]]
+                        max_rank = max([self.resp_ranks[resp_id][i] for i in deffered])
+                        max_id = self.resp_prefs[resp_id][max_rank]
+                        if self.resp_ranks[resp_id][prop_id] < max_rank:
+                            prop_single.append(max_id)
+                            prop_single.remove(prop_id)
+                            self.prop_matched[max_id] = self.prop_unmatched
+                            self.prop_matched[prop_id] = resp_id
+                            self.resp_matched[np.where(self.resp_matched == max_id)[0]] = prop_id
+                            break
+                if prop_id in prop_single:
+                    prop_single.remove(prop_id)
+                    self.prop_matched[prop_id] = self.prop_unmatched
         if self.switch == 0:
                 return self.prop_matched, self.resp_matched
         else:
             return self.prop_matched, self.resp_matched, self.indptr
 
+    def TTC(self):
+        """
+        Get the stable matching pairs by Top Trading Cycle Algorithm.
+        """
+        self.algo = "Top Trading Cycle"
+        self.prop_matched = np.zeros(self.prop_num, dtype=int) + self.prop_unmatched
+        self.resp_matched = np.zeros(sum(self.caps), dtype=int) + self.resp_unmatched
+        prop_single = range(self.prop_num)
+        caps_rest = [i for i in self.caps]
 
-    def summary(self, switch=None):
+        def make_unmatched(prop_id):
+            prop_single.remove(prop_id)
+            self.prop_matched[prop_id] = self.prop_unmatched
+
+        while len(prop_single) >= 1:
+            prop_approach = [0 for i in range(self.prop_num)]
+            resp_approach = [0 for i in range(self.resp_num)]
+            prop_id = prop_single[0]
+            prop_circle = [0 for i in range(self.prop_num)]
+            trading_chain = [[],[]]
+            trading_chain[0].append(prop_id)
+            prop_circle[prop_id] += 1
+            while True:
+                if prop_approach[prop_id] > len(self.prop_prefs):
+                    make_unmatched(prop_id)
+                    success = False
+                    break
+                resp_id = self.prop_prefs[prop_id][prop_approach[prop_id]]
+                prop_approach[prop_id] += 1
+                if resp_id == self.prop_unmatched:
+                    make_unmatched(prop_id)
+                    success = False
+                    break
+                elif caps_rest[resp_id] >= 1:
+                    next_prop_id = resp_to_prop(resp_id, resp_approach, self.resp_unmatched, self.resp_prefs, prop_single)
+                    if next_prop_id != self.resp_unmatched:
+                        prop_id = next_prop_id
+                        trading_chain[1].append(resp_id)
+                        if prop_circle[prop_id] == 1:
+                            success = True
+                            break
+                        else:
+                            trading_chain[0].append(prop_id)
+                            prop_circle[prop_id] += 1
+                            pass
+                    else:
+                        pass
+                else:
+                    pass
+            if success:
+                ptr = trading_chain[0].index(prop_id)
+                trading_chain[0] = trading_chain[0][ptr:]
+                trading_chain[1] = trading_chain[1][ptr:]
+                for i in range(len(trading_chain[0])):
+                    prop_id = trading_chain[0][i]
+                    resp_id = trading_chain[1][i]
+                    prop_single.remove(prop_id)
+                    self.prop_matched[prop_id] = resp_id
+                    caps_rest[resp_id] -= 1
+                    self.resp_matched[self.indptr[resp_id]+caps_rest[resp_id]] = prop_id
+        if self.switch == 0:
+            return self.prop_matched, self.resp_matched
+        else:
+            return self.prop_matched, self.resp_matched, self.indptr
+
+
+
+    def summary(self):
         print "-----Initial Setting-----"
         print "The number of proposers : %s" % self.prop_num
         print "The number of respondants : %s" % self.resp_num
@@ -147,6 +211,7 @@ class Matching:
             print "One-to-One Matching"
         else:
             print "Many-to-One Matching"
+        print self.algo
         print "-----Result-----"
         print "Stable matching pairs"
         print "Proposers side : "
@@ -199,6 +264,19 @@ class Matching:
         plt.yticks([])
         plt.show
 
+
+def resp_to_prop(resp_id, resp_approach, resp_unmatched, resp_prefs, prop_single):
+    while True:
+        if resp_approach[resp_id] > len(resp_prefs):
+            return resp_unmatched
+        prop_id = resp_prefs[resp_id][resp_approach[resp_id]]
+        if prop_id == resp_unmatched:
+            return resp_unmatched
+        elif prop_id in prop_single:
+            return prop_id
+        else:
+            resp_approach[resp_id] += 1
+            pass
 
 def deferred_acceptance(prop_prefs, resp_prefs, caps=None):
     test = Matching(prop_prefs, resp_prefs, caps)
