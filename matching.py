@@ -194,6 +194,55 @@ class Matching:
             return self.prop_matched, self.resp_matched, self.indptr
 
 
+    def BS(self):
+        """
+        Get the stable matching pairs by The Boston Public Schools System.
+        """
+        self.algo = "Boston Algorithm"
+        self.prop_matched = np.zeros(self.prop_num, dtype=int) + self.prop_unmatched
+        self.resp_matched = np.zeros(sum(self.caps), dtype=int) + self.resp_unmatched
+        prop_single = range(self.prop_num)
+        caps_rest = [i for i in self.caps]
+        choice_num = 0
+
+        while len(prop_single) >= 1:
+            if choice_num == self.resp_num + 1:
+                break
+            choices = np.histogram(self.prop_prefs[prop_single, choice_num], range(self.resp_num+1))[0]
+            for i in range(len(choices)):
+                resp_id = i
+                if caps_rest[resp_id] >= choices[resp_id]:
+                    for j in prop_single:
+                        prop_id = j
+                        if self.prop_prefs[prop_id][choice_num] == resp_id:
+                            prop_single.remove(prop_id)
+                            self.prop_matched[prop_id] = resp_id
+                            caps_rest[resp_id] -= 1
+                            self.resp_matched[self.indptr[resp_id]+caps_rest[resp_id]] = prop_id
+                elif caps_rest[resp_id] != 0:
+                    applicants = []
+                    for j in prop_single:
+                        prop_id = j
+                        if self.prop_prefs[prop_id][choice_num] == resp_id:
+                            applicants.append(prop_id)
+                    for k in range(len(self.resp_prefs)):
+                        if self.resp_prefs[resp_id][k] in applicants:
+                            prop_id = self.resp_prefs[resp_id][k]
+                            prop_single.remove(prop_id)
+                            self.prop_matched[prop_id] = resp_id
+                            caps_rest[resp_id] -= 1
+                            self.resp_matched[self.indptr[resp_id]+caps_rest[resp_id]] = prop_id
+                        if caps_rest[resp_id] == 0:
+                            break
+            choice_num += 1
+        if prop_id in prop_single:
+            prop_single.remove(prop_id)
+            self.prop_matched[prop_id] = self.prop_unmatched
+        if self.switch == 0:
+            return self.prop_matched, self.resp_matched
+        else:
+            return self.prop_matched, self.resp_matched, self.indptr
+
 
     def summary(self):
         print "-----Initial Setting-----"
