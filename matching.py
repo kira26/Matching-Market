@@ -145,13 +145,13 @@ class Matching:
         while len(prop_single) >= 1:
             prop_approach = [0 for i in range(self.prop_num)]
             resp_approach = [0 for i in range(self.resp_num)]
-            prop_id = prop_single[0]
             prop_circle = [0 for i in range(self.prop_num)]
+            prop_id = prop_single[0]
             trading_chain = [[],[]]
             trading_chain[0].append(prop_id)
             prop_circle[prop_id] += 1
             while True:
-                if prop_approach[prop_id] > len(self.prop_prefs):
+                if prop_approach[prop_id] >= self.prop_prefs.shape[1]:
                     make_unmatched(prop_id)
                     success = False
                     break
@@ -162,21 +162,26 @@ class Matching:
                     success = False
                     break
                 elif caps_rest[resp_id] >= 1:
-                    next_prop_id = resp_to_prop(resp_id, resp_approach, self.resp_unmatched, self.resp_prefs, prop_single)
-                    if next_prop_id != self.resp_unmatched:
-                        prop_id = next_prop_id
-                        trading_chain[1].append(resp_id)
-                        if prop_circle[prop_id] == 1:
-                            success = True
+                    success2 = False
+                    while True:
+                        if resp_approach[resp_id] >= self.resp_prefs.shape[1]:
+                            next_prop_id = resp_unmatched
+                            success2 = True
                             break
-                        else:
-                            trading_chain[0].append(prop_id)
-                            prop_circle[prop_id] += 1
-                            pass
-                    else:
-                        pass
-                else:
-                    pass
+                        prop_id = self.resp_prefs[resp_id][resp_approach[resp_id]]
+                        resp_approach[resp_id] += 1
+                        if prop_id in prop_single:
+                            trading_chain[1].append(resp_id)
+                            if prop_circle[prop_id] == 1:
+                                success = True
+                                success2 = True
+                                break
+                            else:
+                                trading_chain[0].append(prop_id)
+                                prop_circle[prop_id] += 1
+                                break
+                    if success2:
+                        break
             if success:
                 ptr = trading_chain[0].index(prop_id)
                 trading_chain[0] = trading_chain[0][ptr:]
@@ -206,28 +211,23 @@ class Matching:
         choice_num = 0
 
         while len(prop_single) >= 1:
-            if choice_num == self.resp_num + 1:
+            prop_single_copy = [i for i in prop_single]
+            if choice_num == self.prop_prefs.shape[1]:
                 break
             choices = np.histogram(self.prop_prefs[prop_single, choice_num], range(self.resp_num+1))[0]
-            for i in range(len(choices)):
-                resp_id = i
+            for resp_id in range(self.resp_num):
                 if caps_rest[resp_id] >= choices[resp_id]:
-                    for j in prop_single:
-                        prop_id = j
+                    for prop_id in prop_single_copy:
                         if self.prop_prefs[prop_id][choice_num] == resp_id:
                             prop_single.remove(prop_id)
                             self.prop_matched[prop_id] = resp_id
                             caps_rest[resp_id] -= 1
                             self.resp_matched[self.indptr[resp_id]+caps_rest[resp_id]] = prop_id
                 elif caps_rest[resp_id] != 0:
-                    applicants = []
-                    for j in prop_single:
-                        prop_id = j
-                        if self.prop_prefs[prop_id][choice_num] == resp_id:
-                            applicants.append(prop_id)
-                    for k in range(len(self.resp_prefs)):
-                        if self.resp_prefs[resp_id][k] in applicants:
-                            prop_id = self.resp_prefs[resp_id][k]
+                    applicants = [i for i in prop_single_copy if self.prop_prefs[i][choice_num] == resp_id]
+                    for k in range(self.prop_num):
+                        prop_id = self.resp_prefs[resp_id][k]
+                        if prop_id in applicants:
                             prop_single.remove(prop_id)
                             self.prop_matched[prop_id] = resp_id
                             caps_rest[resp_id] -= 1
