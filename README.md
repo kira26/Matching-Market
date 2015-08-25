@@ -25,4 +25,5 @@ Use Python for web programming.
 ・A.E. Roth, "[Deferred Acceptance Algorithms: History, Theory, Practice, and Open Questions](http://link.springer.com/article/10.1007/s00182-008-0117-6)," International Journal of Game Theory 36 (2008), 537-569  
 ・A. Abdulkadiroğlu and T. Sönmez, "[Matching Markets: Theory and Practice](http://ebooks.cambridge.org/chapter.jsf?bid=CBO9781139060011&cid=CBO9781139060011A010&tabName=Chapter)," Cambridge University Press (2013), 3-47  
 ・安田 洋祐「学校選択制のデザイン―ゲーム理論アプローチ」(2010, エヌティティ出版)  
-・川越 敏司「マーケット・デザイン オークションとマッチングの経済学」(2015, 講談社)
+・川越 敏司「マーケット・デザイン オークションとマッチングの経済学」(2015, 講談社)  
+・Echenique, Federico, and Jorge Oviedo. "[A theory of stability in many-to-many matching markets.](http://papers.ssrn.com/sol3/papers.cfm?abstract_id=691443)" (2004).  
