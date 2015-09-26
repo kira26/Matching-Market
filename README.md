@@ -1,24 +1,15 @@
 #Matching-Market
 Learning Matching-Market with coding in Python.  
 
-##Matching
-Compute the Stable Matching  
+There are matching algorithm functions in [matching.py](https://github.com/ogaway/Matching-Market/blob/master/matching.py).   
 
 Now you can use these algorithms:  
+・Normal Matching  
 ・Deffered Acceptance  
 ・Top Trading Cycle  
-・The Boston Public Schools System  
 
 ##Contents
-・[matching.py](https://github.com/ogaway/Matching-Market/blob/master/matching.py)  
-・[Ipython Notebook](http://nbviewer.ipython.org/github/ogaway/Matching-Market/blob/master/matching.ipynb)  
-・[Web Page](https://ogaway.github.io/marriage/index.html)  
-  
-##Packages
-・[NetworkX](https://networkx.github.io/)  
-Draw matching-graphs.   
-・[Brython](http://www.brython.info/)  
-Use Python for web programming.  
+・[One-to-One Matching](https://github.com/ogaway/Matching-Market/blob/master/One-to-One.ipynb)  
   
 ##References
 ・Roth, Alvin E., and Marilda A. Oliveira Sotomayor. Two-sided matching: A study in game-theoretic modeling and analysis. No. 18. Cambridge University Press, 1992. ( [Amazon](http://www.amazon.co.jp/dp/0521437881) )  
