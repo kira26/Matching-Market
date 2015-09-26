@@ -1,14 +1,14 @@
 #Matching-Market
 Learning Matching-Market with coding in Python.  
 
+##Functions
 There are matching algorithm functions in [matching.py](https://github.com/ogaway/Matching-Market/blob/master/matching.py).   
-
 Now you can use these algorithms:  
 ・Normal Matching  
 ・Deffered Acceptance  
 ・Top Trading Cycle  
 
-##Contents
+##Notebooks
 ・[One-to-One Matching](https://github.com/ogaway/Matching-Market/blob/master/One-to-One.ipynb)  
   
 ##References
