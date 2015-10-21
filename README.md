@@ -19,5 +19,7 @@ Now you can use these algorithms:
 ・Echenique, Federico, and Jorge Oviedo. "[A theory of stability in many-to-many matching markets.](http://papers.ssrn.com/sol3/papers.cfm?abstract_id=691443)" (2004).  
 ・Doğan, Mustafa Kadir. "[Matching with Restricted Preferences.](http://dergipark.ulakbim.gov.tr/sosyoekonomi/article/view/5000080555)" Sosyoekonomi 5.2 (2009).  
 ・Romero-Medina, Antonio. "[Implementation of stable solutions in a restricted matching market.](http://link.springer.com/article/10.1007/s100580050009)" Review of Economic Design 3.2 (1998): 137-147.  
+・Calsamiglia, Caterina, Guillaume Haeringer, and Flip Klijn. "Constrained school choice: An experimental study." The American Economic Review (2010): 1860-1874.  
+・Toshiji Kawagoe, Taisuke Matsubae, and Hirokazu Takizawa. "Truth-telling and stability in school choice problme with affirmative action: theory and experiment," ESA European meeting 2015  
 ・安田 洋祐「学校選択制のデザイン―ゲーム理論アプローチ」(2010, エヌティティ出版)  
 ・川越 敏司「マーケット・デザイン オークションとマッチングの経済学」(2015, 講談社)  
