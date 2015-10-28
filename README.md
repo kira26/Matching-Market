@@ -10,6 +10,7 @@ Now you can use these algorithms:
 
 ##Notebooks
 ・[One-to-One Matching](http://nbviewer.ipython.org/github/ogaway/Matching-Market/blob/master/One-to-One.ipynb)  
+・[Nash Equilibrium](http://nbviewer.ipython.org/github/ogaway/Matching-Market/blob/master/Nash_Match.ipynb)  
   
 ##References
 ・Roth, Alvin E., and Marilda A. Oliveira Sotomayor. Two-sided matching: A study in game-theoretic modeling and analysis. No. 18. Cambridge University Press, 1992. ( [Amazon](http://www.amazon.co.jp/dp/0521437881) )  
