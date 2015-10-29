@@ -336,10 +336,16 @@ def Graph(prop_matched, resp_matched, prop_indptr=None, resp_indptr=None, prop_n
     """
     if prop_indptr is None:
         prop_num = len(prop_matched)
+        prop_caps = np.ones(prop_num)
+        prop_indptr = np.zeros(prop_num+1, dtype=int)
+        np.cumsum(prop_caps, out=prop_indptr[1:])
     else:
         prop_num = len(prop_indptr) - 1
     if resp_indptr is None:
         resp_num = len(resp_matched)
+        resp_caps = np.ones(resp_num)
+        resp_indptr = np.zeros(resp_num+1, dtype=int)
+        np.cumsum(resp_caps, out=resp_indptr[1:])
     else:
         resp_num = len(resp_indptr) - 1
     if prop_name is None:
