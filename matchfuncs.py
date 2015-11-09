@@ -82,8 +82,8 @@ def DA(prop_prefs, resp_prefs, resp_caps=None, prop_caps=None, list_length=None)
             elif respcaps_rest[resp_id] >= 1:
                 propcaps_rest[prop_id] -= 1
                 respcaps_rest[resp_id] -= 1
-                prop_matched[prop_indptr[prop_id]+propcaps_rest[prop_id]] = resp_id
-                resp_matched[resp_indptr[resp_id]+respcaps_rest[resp_id]] = prop_id
+                prop_matched[np.where(prop_matched[prop_indptr[prop_id]:prop_indptr[prop_id+1]] == prop_unmatched)[0][0] + prop_indptr[prop_id]] = resp_id
+                resp_matched[np.where(resp_matched[resp_indptr[resp_id]:resp_indptr[resp_id+1]] == resp_unmatched)[0][0] + resp_indptr[resp_id]] = prop_id
                 if propcaps_rest[prop_id] == 0:
                     prop_single.remove(prop_id)
             else:
@@ -91,12 +91,13 @@ def DA(prop_prefs, resp_prefs, resp_caps=None, prop_caps=None, list_length=None)
                 max_rank = max([resp_ranks[resp_id][i] for i in deffered])
                 max_id = resp_prefs[resp_id][max_rank]
                 if resp_ranks[resp_id][prop_id] < max_rank:
-                    prop_single.append(max_id)
+                    if max_id not in prop_single:
+                        prop_single.append(max_id)
                     propcaps_rest[max_id] += 1
                     propcaps_rest[prop_id] -= 1
-                    prop_matched[np.where(prop_matched[prop_indptr[max_id]:prop_indptr[max_id+1]] == resp_id)[0] + prop_indptr[max_id]] = prop_unmatched
-                    prop_matched[prop_indptr[prop_id]+propcaps_rest[prop_id]] = resp_id
-                    resp_matched[np.where(resp_matched[resp_indptr[resp_id]:resp_indptr[resp_id+1]] == max_id)[0] + resp_indptr[resp_id]] = prop_id
+                    prop_matched[np.where(prop_matched[prop_indptr[max_id]:prop_indptr[max_id+1]] == resp_id)[0][0] + prop_indptr[max_id]] = prop_unmatched
+                    prop_matched[np.where(prop_matched[prop_indptr[prop_id]:prop_indptr[prop_id+1]] == prop_unmatched)[0][0] + prop_indptr[prop_id]] = resp_id
+                    resp_matched[np.where(resp_matched[resp_indptr[resp_id]:resp_indptr[resp_id+1]] == max_id)[0][0] + resp_indptr[resp_id]] = prop_id
                     if propcaps_rest[prop_id] == 0:
                         prop_single.remove(prop_id)
 
@@ -198,19 +199,22 @@ def BOS(prop_prefs, resp_prefs, resp_caps=None, prop_caps=None, list_length=None
                     if prop_prefs[prop_id][prop_prefsptr[prop_id]-1] == resp_id:
                         propcaps_rest[prop_id] -= 1
                         respcaps_rest[resp_id] -= 1
-                        prop_matched[prop_indptr[prop_id]+propcaps_rest[prop_id]] = resp_id
-                        resp_matched[resp_indptr[resp_id]+respcaps_rest[resp_id]] = prop_id
+                        prop_matched[np.where(prop_matched[prop_indptr[prop_id]:prop_indptr[prop_id+1]] == prop_unmatched)[0][0] + prop_indptr[prop_id]] = resp_id
+                        resp_matched[np.where(resp_matched[resp_indptr[resp_id]:resp_indptr[resp_id+1]] == resp_unmatched)[0][0] + resp_indptr[resp_id]] = prop_id
                         if propcaps_rest[prop_id] == 0:
                             prop_single.remove(prop_id)
             elif respcaps_rest[resp_id] != 0:
-                applicants = [i for i in prop_single_copy if prop_prefs[i][prop_prefsptr[prop_id]-1] == resp_id]
+                applicants = []
+                for prop_id in prop_single_copy:
+                    if prop_prefs[prop_id][prop_prefsptr[prop_id]-1] == resp_id:
+                        applicants.append(prop_id)
                 for k in range(resp_prefs.shape[1]):
                     prop_id = resp_prefs[resp_id][k]
                     if prop_id in applicants:
                         propcaps_rest[prop_id] -= 1
                         respcaps_rest[resp_id] -= 1
-                        prop_matched[prop_indptr[prop_id]+propcaps_rest[prop_id]] = resp_id
-                        resp_matched[resp_indptr[resp_id]+respcaps_rest[resp_id]] = prop_id
+                        prop_matched[np.where(prop_matched[prop_indptr[prop_id]:prop_indptr[prop_id+1]] == prop_unmatched)[0][0] + prop_indptr[prop_id]] = resp_id
+                        resp_matched[np.where(resp_matched[resp_indptr[resp_id]:resp_indptr[resp_id+1]] == resp_unmatched)[0][0] + resp_indptr[resp_id]] = prop_id
                         if propcaps_rest[prop_id] == 0:
                             prop_single.remove(prop_id)
                     if respcaps_rest[resp_id] == 0:
@@ -314,16 +318,16 @@ def AddBOS(prop_prefs, resp_prefs, prop_matched, resp_matched, resp_caps=None, p
                 for prop_id in applicants:
                     propcaps_rest[prop_id] -= 1
                     respcaps_rest[resp_id] -= 1
-                    prop_matched[prop_indptr[prop_id]+propcaps_rest[prop_id]] = resp_id
-                    resp_matched[resp_indptr[resp_id]+respcaps_rest[resp_id]] = prop_id
+                    prop_matched[np.where(prop_matched[prop_indptr[prop_id]:prop_indptr[prop_id+1]] == prop_unmatched)[0][0] + prop_indptr[prop_id]] = resp_id
+                    resp_matched[np.where(resp_matched[resp_indptr[resp_id]:resp_indptr[resp_id+1]] == resp_unmatched)[0][0] + resp_indptr[resp_id]] = prop_id
             else:
                 for k in add_resp_prefs[resp_id]:
                     prop_id = add_prop[k]
                     if prop_id in applicants:
                         propcaps_rest[prop_id] -= 1
                         respcaps_rest[resp_id] -= 1
-                        prop_matched[prop_indptr[prop_id]+propcaps_rest[prop_id]] = resp_id
-                        resp_matched[resp_indptr[resp_id]+respcaps_rest[resp_id]] = prop_id
+                        prop_matched[np.where(prop_matched[prop_indptr[prop_id]:prop_indptr[prop_id+1]] == prop_unmatched)[0][0] + prop_indptr[prop_id]] = resp_id
+                        resp_matched[np.where(resp_matched[resp_indptr[resp_id]:resp_indptr[resp_id+1]] == resp_unmatched)[0][0] + resp_indptr[resp_id]] = prop_id
                     if respcaps_rest[resp_id] == 0:
                         break
     if interview is not None:
@@ -545,7 +549,7 @@ def ConstNash(nashs, behavior, list_length):
                 nash_prefs.append(submit_pref)
     return nash_prefs
 
-def Comp(algo, prop_prefs, resp_prefs, resp_caps=None, prop_caps=None, list_length=None):
+def Comp(algo, submit_prefs, prop_prefs, resp_prefs, resp_caps=None, prop_caps=None, list_length=None):
     """
     Comparison under the truth-telling circumstances
     """
@@ -559,41 +563,41 @@ def Comp(algo, prop_prefs, resp_prefs, resp_caps=None, prop_caps=None, list_leng
     if algo == 'DA':
         if switch == 0:
             prop_matched, resp_matched = \
-                DA(prop_prefs, resp_prefs, resp_caps, prop_caps, list_length)
+                DA(submit_prefs, resp_prefs, resp_caps, prop_caps, list_length)
         elif switch == 1:
             prop_matched, resp_matched, resp_indptr = \
-                DA(prop_prefs, resp_prefs, resp_caps, prop_caps, list_length)
+                DA(submit_prefs, resp_prefs, resp_caps, prop_caps, list_length)
         elif switch == 2:
             prop_matched, resp_matched, prop_indptr, resp_indptr = \
-                DA(prop_prefs, resp_prefs, resp_caps, prop_caps, list_length)
+                DA(submit_prefs, resp_prefs, resp_caps, prop_caps, list_length)
     elif algo == 'BOS':
         if switch == 0:
             prop_matched, resp_matched = \
-                BOS(prop_prefs, resp_prefs, resp_caps, prop_caps, list_length)
+                BOS(submit_prefs, resp_prefs, resp_caps, prop_caps, list_length)
         elif switch == 1:
             prop_matched, resp_matched, resp_indptr = \
-                BOS(prop_prefs, resp_prefs, resp_caps, prop_caps, list_length)
+                BOS(submit_prefs, resp_prefs, resp_caps, prop_caps, list_length)
         elif switch == 2:
             prop_matched, resp_matched, prop_indptr, resp_indptr = \
-                BOS(prop_prefs, resp_prefs, resp_caps, prop_caps, list_length)
+                BOS(submit_prefs, resp_prefs, resp_caps, prop_caps, list_length)
     elif algo == 'DAAdd':
         if switch == 0:
             prop_matched, resp_matched = \
-                DA(prop_prefs, resp_prefs, resp_caps, prop_caps, list_length-1)
+                DA(submit_prefs, resp_prefs, resp_caps, prop_caps, list_length-1)
             prop_matched, resp_matched = \
-                AddBOS(prop_prefs, resp_prefs, prop_matched, resp_matched, resp_caps, prop_caps)
+                AddBOS(submit_prefs, resp_prefs, prop_matched, resp_matched, resp_caps, prop_caps)
         elif switch == 1:
             prop_matched, resp_matched, resp_indptr = \
-                DA(prop_prefs, resp_prefs, resp_caps, prop_caps, list_length-1)
+                DA(submit_prefs, resp_prefs, resp_caps, prop_caps, list_length-1)
             prop_matched, resp_matched, resp_indptr = \
-                AddBOS(prop_prefs, resp_prefs, prop_matched, resp_matched, resp_caps, prop_caps)
+                AddBOS(submit_prefs, resp_prefs, prop_matched, resp_matched, resp_caps, prop_caps)
         elif switch == 2:
             prop_matched, resp_matched, prop_indptr, resp_indptr = \
-                DA(prop_prefs, resp_prefs, resp_caps, prop_caps, list_length-1)
+                DA(submit_prefs, resp_prefs, resp_caps, prop_caps, list_length-1)
             prop_matched, resp_matched, prop_indptr, resp_indptr = \
-                AddBOS(prop_prefs, resp_prefs, prop_matched, resp_matched, resp_caps, prop_caps)
+                AddBOS(submit_prefs, resp_prefs, prop_matched, resp_matched, resp_caps, prop_caps)
     JE_num = CountJE(prop_prefs, resp_prefs, prop_matched, resp_matched, resp_caps, prop_caps)
-    tt_num = CountTT(prop_prefs, prop_prefs, list_length)
+    tt_num = CountTT(prop_prefs, submit_prefs, list_length)
     prop_eff, resp_eff = MeanEff(prop_prefs, resp_prefs, prop_matched, resp_matched, resp_caps, prop_caps)
     prop_poor, resp_poor = CountPoor(prop_prefs, resp_prefs, prop_matched, resp_matched, resp_caps, prop_caps)
     interview_num = CountInte(algo, prop_prefs, resp_prefs, resp_caps, prop_caps, list_length)
@@ -703,16 +707,21 @@ def MakeCVprefs(prop_num, resp_num, alpha=0.3, beta=0.3):
       Preference of respondants
 
     """
-    prop_cv = np.dot(sorted(np.random.rand(resp_num, 1)), np.ones((1, prop_num))).T
+    popularity = np.random.rand(resp_num, 1)
+    grade = np.random.normal(50, 10, [prop_num, 1])
+    popu_ranks = np.argsort(popularity.T[0])[::-1]
+
+    prop_cv = np.dot(popularity, np.ones((1, prop_num))).T
     prop_pv = np.random.rand(prop_num, resp_num)
     prop_uti = alpha * prop_cv + (1 - alpha) * prop_pv
-    prop_prefs = np.argsort(prop_uti)
-    resp_cv = np.dot(sorted(np.random.rand(prop_num, 1)), np.ones((1, resp_num))).T
+    prop_prefs = np.argsort(prop_uti)[:, ::-1]
+
+    resp_cv = np.dot(grade, np.ones((1, resp_num))).T
     resp_pv = np.random.rand(resp_num, prop_num)
     resp_uti = beta * resp_cv + (1 - beta) * resp_pv
-    resp_prefs = np.argsort(resp_uti)
+    resp_prefs = np.argsort(resp_uti)[:, ::-1]
 
-    return prop_prefs, resp_prefs
+    return prop_prefs, resp_prefs, popu_ranks, grade.T[0]
 
 def CountJE(prop_prefs, resp_prefs, prop_matched, resp_matched, resp_caps=None, prop_caps=None):
     """
@@ -793,8 +802,15 @@ def CountTT(prop_prefs, subprefs, list_length):
     subprefs = np.asarray(subprefs)
     tt_num = 0
     for prop_id in range(prop_prefs.shape[0]):
-        if prop_prefs[prop_id][:list_length].tolist() == subprefs[prop_id][:list_length].tolist():
-            tt_num += 1
+        if subprefs[prop_id][1] == 4: # resp_num = 4
+            if prop_prefs[prop_id][:1].tolist() == subprefs[prop_id][:1].tolist():
+                tt_num += 1
+        elif subprefs[prop_id][2] == 4: # resp_num = 4
+            if prop_prefs[prop_id][:2].tolist() == subprefs[prop_id][:2].tolist():
+                tt_num += 1
+        else:
+            if prop_prefs[prop_id][:list_length].tolist() == subprefs[prop_id][:list_length].tolist():
+                tt_num += 1
     return tt_num
 
 def MeanEff(prop_prefs, resp_prefs, prop_matched, resp_matched, resp_caps=None, prop_caps=None):
@@ -932,6 +948,8 @@ def CountInte(algo, prop_prefs, resp_prefs, resp_caps=None, prop_caps=None, list
     resp_prefs = np.asarray(resp_prefs)
     prop_num = prop_prefs.shape[0]
     resp_num = resp_prefs.shape[0]
+    if list_length is None:
+        list_length = resp_num
     if algo == 'BOS':
         interview_num = BOS(prop_prefs, resp_prefs, resp_caps, prop_caps, list_length, 1)
     elif algo == 'DA':
