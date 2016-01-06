@@ -2,14 +2,21 @@
 Matching-Market in Python.  
 
 ##Functions
-There are matching algorithm functions in [matchfuncs.py](https://github.com/ogaway/Matching-Market/blob/master/matchfuncs.py).   
+[matchfuncs.py](https://github.com/ogaway/Matching-Market/blob/master/matchfuncs.py)   
+
+##Graduate Thesis
+・[Chapter2-1](http://nbviewer.ipython.org/github/ogaway/Matching-Market/blob/master/chap2-1.ipynb)  
+・[Chapter2-2](http://nbviewer.ipython.org/github/ogaway/Matching-Market/blob/master/chap2-2.ipynb)  
+・[Chapter3](http://nbviewer.ipython.org/github/ogaway/Matching-Market/blob/master/chap3.ipynb)  
+・[Chapter5](http://nbviewer.ipython.org/github/ogaway/Matching-Market/blob/master/chap5.ipynb)  
+・[Chapter6](http://nbviewer.ipython.org/github/ogaway/Matching-Market/blob/master/chap6.ipynb)  
 
 ##Notebooks
 ・[One-to-One Matching](http://nbviewer.ipython.org/github/ogaway/Matching-Market/blob/master/One-to-One.ipynb)  
 ・[Nash Equilibrium](http://nbviewer.ipython.org/github/ogaway/Matching-Market/blob/master/Nash_Match.ipynb)  
 ・[Analysis of the current state](http://nbviewer.ipython.org/github/ogaway/Matching-Market/blob/master/Analysis.ipynb)  
 ・[Compare the mechanisms](http://nbviewer.ipython.org/github/ogaway/Matching-Market/blob/master/Comparison.ipynb)  
-  
+
 ##References
 ・Roth, Alvin E., and Marilda A. Oliveira Sotomayor. Two-sided matching: A study in game-theoretic modeling and analysis. No. 18. Cambridge University Press, 1992. ( [Amazon](http://www.amazon.co.jp/dp/0521437881) )  
 ・D. Gale and L.S. Shapley, "[College Admissions and the Stability of Marriage](http://www.jstor.org/stable/2312726?seq=1#page_scan_tab_contents)," American Mathematical Monthly 69 (1962), 9-15  

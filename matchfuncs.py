@@ -177,6 +177,9 @@ def BOS(prop_prefs, resp_prefs, resp_caps=None, prop_caps=None, list_length=None
                 prop_single.remove(prop_id)
                 continue
             resp_id = prop_prefs[prop_id][prop_prefsptr[prop_id]]
+            if resp_id == prop_unmatched:
+                prop_single.remove(prop_id)
+                continue
             while respcaps_rest[resp_id] == 0:
                 prop_prefsptr[prop_id] += 1
                 if prop_prefsptr[prop_id] == prop_prefs.shape[1]:
@@ -448,20 +451,20 @@ def Nash(algo, prop_prefs, resp_prefs, resp_caps=None, prop_caps=None, list_leng
         if algo == 'DA':
             if switch == 0:
                 prop_matched, resp_matched = \
-                    DA(iter_prefs, resp_prefs, resp_caps, prop_caps, list_length)
+                    DA(iter_prefs, resp_prefs, None, None, list_length)
             elif switch == 1:
                 prop_matched, resp_matched, resp_indptr = \
-                    DA(iter_prefs, resp_prefs, resp_caps, prop_caps, list_length)
+                    DA(iter_prefs, resp_prefs, resp_caps, None, list_length)
             elif switch == 2:
                 prop_matched, resp_matched, prop_indptr, resp_indptr = \
                     DA(iter_prefs, resp_prefs, resp_caps, prop_caps, list_length)
         elif algo == 'BOS':
             if switch == 0:
                 prop_matched, resp_matched = \
-                    BOS(iter_prefs, resp_prefs, resp_caps, prop_caps, list_length)
+                    BOS(iter_prefs, resp_prefs, None, None, list_length)
             elif switch == 1:
                 prop_matched, resp_matched, resp_indptr = \
-                    BOS(iter_prefs, resp_prefs, resp_caps, prop_caps, list_length)
+                    BOS(iter_prefs, resp_prefs, resp_caps, None, list_length)
             elif switch == 2:
                 prop_matched, resp_matched, prop_indptr, resp_indptr = \
                     BOS(iter_prefs, resp_prefs, resp_caps, prop_caps, list_length)
@@ -861,8 +864,18 @@ def MeanEff(prop_prefs, resp_prefs, prop_matched, resp_matched, resp_caps=None, 
     resp_indptr = np.zeros(resp_num+1, dtype=int)
     np.cumsum(prop_caps, out=prop_indptr[1:])
     np.cumsum(resp_caps, out=resp_indptr[1:])
-    prop_meanrank = [np.mean(prop_ranks[i, prop_matched[prop_indptr[i]:prop_indptr[i+1]]]) for i in range(prop_num)]
-    resp_meanrank = [np.mean(resp_ranks[i, resp_matched[resp_indptr[i]:resp_indptr[i+1]]]) for i in range(resp_num)]
+    for i in range(prop_num):
+        prop_pair = prop_matched[prop_indptr[i]:prop_indptr[i+1]].tolist()
+        while resp_num in prop_pair:
+            prop_pair.remove(resp_num)
+        if len(prop_pair) > 0:
+            prop_meanrank = [np.mean(prop_ranks[i, prop_pair])]
+    for i in range(resp_num):
+        resp_pair = resp_matched[resp_indptr[i]:resp_indptr[i+1]].tolist()
+        while prop_num in resp_pair:
+            resp_pair.remove(prop_num)
+        if len(resp_pair) > 0:
+            resp_meanrank = [np.mean(resp_ranks[i, resp_pair])]
     prop_eff = np.mean(prop_meanrank)
     resp_eff = np.mean(resp_meanrank)
     return round(prop_eff, 3), round(resp_eff, 3)
