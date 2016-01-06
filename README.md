@@ -4,7 +4,7 @@ Matching-Market in Python.
 ##Functions
 [matchfuncs.py](https://github.com/ogaway/Matching-Market/blob/master/matchfuncs.py)   
 
-##Graduate Thesis
+##Graduation Thesis
 - [My Graduation Thesis](http://nbviewer.ipython.org/github/ogaway/Matching-Market/blob/master/grad.pdf)  
     - [Chapter2-1](http://nbviewer.ipython.org/github/ogaway/Matching-Market/blob/master/chap2-1.ipynb)  
     - [Chapter2-2](http://nbviewer.ipython.org/github/ogaway/Matching-Market/blob/master/chap2-2.ipynb)  
