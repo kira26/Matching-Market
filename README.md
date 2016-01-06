@@ -5,11 +5,12 @@ Matching-Market in Python.
 [matchfuncs.py](https://github.com/ogaway/Matching-Market/blob/master/matchfuncs.py)   
 
 ##Graduate Thesis
-・[Chapter2-1](http://nbviewer.ipython.org/github/ogaway/Matching-Market/blob/master/chap2-1.ipynb)  
-・[Chapter2-2](http://nbviewer.ipython.org/github/ogaway/Matching-Market/blob/master/chap2-2.ipynb)  
-・[Chapter3](http://nbviewer.ipython.org/github/ogaway/Matching-Market/blob/master/chap3.ipynb)  
-・[Chapter5](http://nbviewer.ipython.org/github/ogaway/Matching-Market/blob/master/chap5.ipynb)  
-・[Chapter6](http://nbviewer.ipython.org/github/ogaway/Matching-Market/blob/master/chap6.ipynb)  
+- [My Graduation Thesis](http://nbviewer.ipython.org/github/ogaway/Matching-Market/blob/master/grad.pdf)  
+    - [Chapter2-1](http://nbviewer.ipython.org/github/ogaway/Matching-Market/blob/master/chap2-1.ipynb)  
+    - [Chapter2-2](http://nbviewer.ipython.org/github/ogaway/Matching-Market/blob/master/chap2-2.ipynb)  
+    - [Chapter3](http://nbviewer.ipython.org/github/ogaway/Matching-Market/blob/master/chap3.ipynb)  
+    - [Chapter5](http://nbviewer.ipython.org/github/ogaway/Matching-Market/blob/master/chap5.ipynb)  
+    - [Chapter6](http://nbviewer.ipython.org/github/ogaway/Matching-Market/blob/master/chap6.ipynb)  
 
 ##Notebooks
 ・[One-to-One Matching](http://nbviewer.ipython.org/github/ogaway/Matching-Market/blob/master/One-to-One.ipynb)  
